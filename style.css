@@ -1,0 +1,18 @@
+/* 📦 Estilos específicos App 2 */
+.controls {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0;
+  padding: 0 1rem; max-width: 900px; margin: 1rem auto;
+}
+.controls input, .controls select {
+  padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--text); flex: 1; min-width: 120px;
+}
+#sort-btn { background: var(--primary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500; }
+
+/* Campos dinámicos del modal */
+.dynamic-list { list-style: none; padding: 0; margin: 0.3rem 0; }
+.dynamic-list li { display: flex; justify-content: space-between; align-items: center; background: var(--border); padding: 0.4rem 0.6rem; border-radius: 4px; margin-bottom: 0.3rem; font-size: 0.9rem; }
+.dynamic-list li button { background: #ef4444; color: white; border: none; border-radius: 4px; padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.8rem; }
+.add-row { display: flex; gap: 0.4rem; align-items: center; margin: 0.4rem 0; }
+.add-row select, .add-row input { flex: 1; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); }
+.add-btn-sm { background: var(--primary); color: white; border: none; border-radius: 4px; padding: 0.5rem; cursor: pointer; }

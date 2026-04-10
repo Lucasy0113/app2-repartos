@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+  <title>Gestión Repartos</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <button id="user-menu-btn" class="user-menu-btn" aria-label="Usuario">👤</button>
+    <h1>📦 Gestión de Repartos</h1>
+    <button id="theme-toggle" title="Cambiar tema">🌗</button>
+  </header>
+
+  <main id="app">
+    <section id="summary" class="summary-card"></section>
+    
+    <div class="controls">
+      <input type="text" id="search-input" placeholder="🔍 Buscar...">
+      <select id="filter-province"><option value="">Todas las Provincias</option><option value="Artemisa">Artemisa</option><option value="Habana">Habana</option></select>
+      <select id="filter-municipality"><option value="">Todos los Municipios</option></select>
+      <button id="sort-btn" title="Ordenar">⬇️ Reciente</button>
+      <button id="clear-filters" title="Limpiar filtros" style="background:var(--border);border:none;border-radius:4px;cursor:pointer;">✖</button>
+    </div>
+
+    <section id="list-container" class="list-container"></section>
+    <div id="pagination" class="pagination"></div>
+  </main>
+
+  <button id="add-btn" class="fab" aria-label="Agregar viaje">+</button>
+
+  <dialog id="modal">
+    <form id="record-form">
+      <h2 id="modal-title">Nuevo Registro</h2>
+      <div id="form-fields"></div>
+      <div class="modal-actions">
+        <button type="button" id="cancel-btn">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Menú Lateral Usuario -->
+  <div id="user-drawer" class="drawer">
+    <div class="drawer-content">
+      <button id="close-drawer" class="close-btn">&times;</button>
+      <h2 style="margin:0 0 0.5rem;">Mi Cuenta</h2>
+      <p id="user-email-display" class="user-info"></p>
+      <hr class="drawer-divider">
+      <form id="change-pass-form">
+        <input type="password" id="current-pass" placeholder="Contraseña actual" required minlength="6">
+        <input type="password" id="new-pass" placeholder="Nueva contraseña" required minlength="6">
+        <input type="password" id="confirm-pass" placeholder="Confirmar nueva" required minlength="6">
+        <button type="submit" class="btn-primary">Actualizar</button>
+        <p id="pass-msg" class="msg"></p>
+      </form>
+      <hr class="drawer-divider">
+      <button id="logout-btn" class="btn-danger">🚪 Cerrar Sesión</button>
+    </div>
+    <div class="drawer-overlay"></div>
+  </div>
+
+  <!-- Overlay Carga -->
+  <div id="loading-overlay" class="loading-overlay"><div class="loading-spinner"></div><p>Procesando...</p></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
