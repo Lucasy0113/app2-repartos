@@ -1,4 +1,4 @@
-// App 2: Gestión de Repartos - Versión Corregida
+// App 2: Gestión de Repartos - Versión Final Corregida
 let currentPage = 1;
 const ITEMS_PER_PAGE = 10;
 let editingId = null;
@@ -6,29 +6,23 @@ let currentUser = null;
 let allRecords = [];
 let filteredRecords = [];
 
-// Municipios por provincia (Cuba)
 const PROVINCIAS = ['Artemisa', 'Habana'];
 const MUNICIPIOS = {
   Artemisa: ['Artemisa', 'Alquízar', 'Bahía Honda', 'Bauta', 'Candelaria', 'Caimito', 'Guanajay', 'Güira de Melena', 'La Palma', 'Los Palacios', 'Mariel', 'San Antonio de los Baños', 'San Cristóbal'],
   Habana: ['Arroyo Naranjo', 'Boyeros', 'Centro Habana', 'Cerro', 'Cotorro', 'Diez de Octubre', 'Guanabacoa', 'Habana del Este', 'Habana Vieja', 'La Lisa', 'Marianao', 'Playa', 'Plaza de la Revolución', 'Regla', 'San Miguel del Padrón']
 };
 
-// Variables DOM
 let $summary, $list, $pagination, $modal, $form, $fields, $themeBtn, $addBtn, $loadingOverlay, $submitBtn;
 let $searchInput, $filterProv, $filterMun, $sortBtn, $clearFilters;
 let $userMenuBtn, $drawer, $closeDrawer, $drawerOverlay, $userEmailDisplay, $passForm, $passMsg, $logoutBtn;
+let $modalActions; // ✅ Para ocultar/mostrar botones del modal
 
-// Estado temporal
 let tempMunis = [];
 let tempClients = [];
 let selectedProvinces = new Set();
-let sortDir = 'desc'; // ⬇️ DESC = Más recientes primero (por defecto)
+let sortDir = 'desc';
 
-// ==================== INICIALIZACIÓN ====================
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🚀 Iniciando App 2...');
-  
-  // Cargar referencias DOM
   $summary = document.getElementById('summary');
   $list = document.getElementById('list-container');
   $pagination = document.getElementById('pagination');
@@ -39,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $addBtn = document.getElementById('add-btn');
   $loadingOverlay = document.getElementById('loading-overlay');
   $submitBtn = document.querySelector('#record-form button[type="submit"]');
+  $modalActions = document.querySelector('.modal-actions'); // ✅ Referencia a botones
   $searchInput = document.getElementById('search-input');
   $filterProv = document.getElementById('filter-province');
   $filterMun = document.getElementById('filter-municipality');
@@ -60,11 +55,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupFilters();
   await checkAuth();
   setupMainEvents();
-  
-  console.log('✅ App 2 inicializada');
 });
 
-// ==================== UTILIDADES ====================
 function waitForDb(timeout = 5000) {
   return new Promise(resolve => {
     if (window.db) return resolve();
@@ -83,7 +75,6 @@ function hideLoading() {
   if ($submitBtn) { $submitBtn.disabled = false; $submitBtn.textContent = 'Guardar'; }
 }
 
-// ==================== TEMA ====================
 function loadTheme() {
   const saved = localStorage.getItem('app2_theme');
   document.body.className = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -94,7 +85,6 @@ function toggleTheme() {
   localStorage.setItem('app2_theme', next);
 }
 
-// ==================== AUTENTICACIÓN ====================
 async function checkAuth() {
   const saved = localStorage.getItem('app2_user');
   if (saved) {
@@ -138,7 +128,6 @@ function setupAuthListener() {
   });
 }
 
-// ==================== MENÚ USUARIO ====================
 function setupUserMenu() {
   if (!$userMenuBtn) return;
   $userMenuBtn.addEventListener('click', () => {
@@ -180,7 +169,6 @@ function setupUserMenu() {
   });
 }
 
-// ==================== FILTROS Y ORDEN ====================
 function setupFilters() {
   $searchInput?.addEventListener('input', applyFilters);
   $filterProv?.addEventListener('change', () => { populateFilterMunis(); applyFilters(); });
@@ -226,7 +214,7 @@ function applyFilters() {
     return true;
   });
 
-  // ✅ Ordenamiento: Por defecto DESC (recientes primero)
+  // ✅ Ordenamiento: DESC = más recientes primero
   filteredRecords.sort((a, b) => {
     const da = new Date(a.date || 0);
     const db = new Date(b.date || 0);
@@ -237,12 +225,11 @@ function applyFilters() {
   renderAll();
 }
 
-// ==================== DATOS ====================
 async function loadData() {
   if (!window.db) { renderAll(); return; }
   try {
     allRecords = await window.db.fetchRecords();
-    applyFilters(); // ✅ Aplica filtros Y orden por defecto al cargar
+    applyFilters();
   } catch (e) {
     console.error('Error cargando:', e);
     allRecords = []; filteredRecords = []; renderAll();
@@ -308,7 +295,6 @@ function renderPagination(total) {
   }
 }
 
-// ==================== EVENTOS PRINCIPALES ====================
 function setupMainEvents() {
   $addBtn?.addEventListener('click', () => currentUser ? openModal() : showLoginModal());
   document.getElementById('cancel-btn')?.addEventListener('click', () => { $modal?.close(); editingId=null; if($form)$form.reset(); resetModalTemp(); });
@@ -319,9 +305,12 @@ function setupMainEvents() {
 
 function resetModalTemp() { tempMunis=[]; tempClients=[{packages:1}]; selectedProvinces.clear(); }
 
-// ==================== MODAL REGISTRO ====================
 function openModal(id = null) {
   if (!currentUser) return showLoginModal();
+  
+  // ✅ Mostrar botones del modal solo para registros
+  if ($modalActions) $modalActions.style.display = 'flex';
+  
   editingId = id;
   const r = id ? allRecords.find(x => x.id === id) : null;
   const titleEl = document.getElementById('modal-title');
@@ -386,7 +375,6 @@ function renderClients() {
     </div>
   `).join('');
 
-  // ✅ Event listeners robustos para paquetes
   cont.querySelectorAll('.client-pkg-input').forEach(inp => {
     inp.addEventListener('input', (e) => {
       const idx = parseInt(e.target.dataset.index);
@@ -403,11 +391,9 @@ function renderClients() {
 window.addClient = () => { tempClients.push({packages:1}); renderClients(); };
 window.removeClient = (i) => { if(tempClients.length>1){tempClients.splice(i,1);renderClients();} };
 
-// ==================== GUARDAR / ELIMINAR ====================
 async function saveRecord() {
   if (!currentUser) return showLoginModal();
   
-  // ✅ Lectura directa del DOM para garantizar valores exactos
   const clientPkgs = Array.from(document.querySelectorAll('.client-pkg-input')).map(inp => ({
     packages: parseFloat(inp.value) || 0
   }));
@@ -420,7 +406,7 @@ async function saveRecord() {
     odometer_end: document.getElementById('f-od-end')?.value,
     provinces: Array.from(selectedProvinces),
     municipalities: [...tempMunis],
-    clients_packages: clientPkgs, // ✅ Garantiza que se guarda lo que ves
+    clients_packages: clientPkgs,
     price: document.getElementById('f-price')?.value,
     tariff: document.getElementById('f-tariff')?.value
   };
@@ -430,7 +416,7 @@ async function saveRecord() {
   showLoading();
   try {
     await window.db.saveRecord(data);
-    await loadData();
+    await loadData(); // ✅ Recarga datos y aplica orden (más recientes primero)
     $modal?.close();
   } catch (err) { alert('Error: ' + err.message); console.error(err); }
   finally { hideLoading(); }
@@ -444,8 +430,10 @@ async function deleteRecord(id) {
   finally { hideLoading(); }
 }
 
-// ==================== LOGIN ====================
 function showLoginModal() {
+  // ✅ Ocultar botones del modal en login
+  if ($modalActions) $modalActions.style.display = 'none';
+  
   const titleEl = document.getElementById('modal-title');
   if (titleEl) titleEl.textContent = 'Iniciar Sesión';
   if ($fields) {
